@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  nombre: MyString
+  direccionIP: MyString
+  SO: MyString
+  motorBase: MyString
+
+two:
+  nombre: MyString
+  direccionIP: MyString
+  SO: MyString
+  motorBase: MyString
