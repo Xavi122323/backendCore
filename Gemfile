@@ -46,3 +46,10 @@ group :development do
   # gem "spring"
 end
 
+gem "importmap-rails", "~> 1.2"
+
+
+gem "devise" 
+
+
+gem 'jwt'
