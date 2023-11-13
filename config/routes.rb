@@ -11,8 +11,8 @@ Rails.application.routes.draw do
 
   namespace :api, defaults: {format: :json} do
     namespace :v1 do
-      root "servidores#index"
-      resources :servidores, only:[:index, :show, :create, :update, :destroy]
+      root "servidor#index"
+      resources :servidor, only:[:index, :show, :create, :update, :destroy]
       devise_scope :user do
         post "sign_up", to: "registrations#create"
         post "sign_in", to: "sessions#create"
