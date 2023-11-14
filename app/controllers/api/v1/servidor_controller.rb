@@ -36,7 +36,7 @@ class Api::V1::ServidorController < ApplicationController
 
     if @servidor
       @servidor.update(nombre: params[:nombre], direccionIP: params[:direccionIP], SO: params[:SO], motorBase: params[:motorBase])
-      render json: "Actualizado exitosamente"
+      render json: {message: "Actualizado exitosamente"}
     else
       render json:{error: "No se pudo actualizar"}
     end
@@ -46,7 +46,7 @@ class Api::V1::ServidorController < ApplicationController
     @servidor = Servidor.find(params[:id])
     if @servidor
       @servidor.destroy
-      render json: "Eliminado exitosamente"
+      render json: {message: "Eliminado exitosamente"}
     end
   end
 
