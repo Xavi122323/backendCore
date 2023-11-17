@@ -20,11 +20,20 @@ class ApplicationController < ActionController::API
 
   def authenticate_user!(options = {})
       #head :unauthorized unless signed_in?
-      head :unauthorized unless signed_in? && (options[:roles].nil? || options[:roles].include?(@current_user_role))
+      head :unauthorized unless signed_in?
   end
 
   def signed_in?
       @current_user_id.present?
+  end
+
+  def authenticate_admin!(options = {})
+      #head :unauthorized unless signed_in?
+      head :unauthorized unless signed_in_admin?
+  end
+
+  def signed_in_admin?
+      @current_user_id.present? && @current_user_role == "1"
   end
 
   def current_user

@@ -1,4 +1,8 @@
 class Api::V1::ServidorController < ApplicationController
+
+  before_action :authenticate_user!, except: [:index, :show]
+  before_action :authenticate_admin!, only: [:destroy]
+
   def index
     @servidor = Servidor.all()
     render json:@servidor, status: 200
@@ -47,6 +51,8 @@ class Api::V1::ServidorController < ApplicationController
     if @servidor
       @servidor.destroy
       render json: {message: "Eliminado exitosamente"}
+    else
+      render json: { error: 'Unable to delete user', errors: user.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -54,4 +60,6 @@ class Api::V1::ServidorController < ApplicationController
     def server_params
       params.require(:servidor).permit(:nombre, :direccionIP, :SO, :motorBase)
     end
+
+    
 end
