@@ -1,7 +1,5 @@
 databases:
   - name: backendCore
-    databaseName: backendCore
-    user: backendCore
 
 services:
   - type: web
