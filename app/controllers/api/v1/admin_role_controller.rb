@@ -1,20 +1,20 @@
 class Api::V1::AdminRoleController < ApplicationController
   def index
-    @admin_role = AdminRole.all
-    render json: @admin_role, status : 200
+    @admin_role = User.all
+    render json: @admin_role, status: 200
   end
 
   def show
-    @admin_role = AdminRole.find(params[:id])
+    @admin_role = User.find(params[:id])
     if @admin_role
-      render json: @admin_role, status : 200
+      render json: @admin_role, status: 200
     else
-      render json: {error: "Usuario no encontrado"}, status : 404
+      render json: {error: "Usuario no encontrado"}, status: 404
     end
   end
 
   def new
-    @admin_role = AdminRole.new
+    @admin_role = User.new
   end
 
   def update
@@ -26,5 +26,5 @@ class Api::V1::AdminRoleController < ApplicationController
       render json: {error: "No se pudo actualizar"}
     end
   end
-  
+
 end
