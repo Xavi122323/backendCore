@@ -1,4 +1,8 @@
 class Api::V1::ServidorController < ApplicationController
+
+  before_action :authenticate_user!, except: [:index, :show]
+  before_action :authenticate_admin!, only: [:destroy]
+
   def index
     @servidor = Servidor.all()
     render json:@servidor, status: 200
@@ -36,7 +40,7 @@ class Api::V1::ServidorController < ApplicationController
 
     if @servidor
       @servidor.update(nombre: params[:nombre], direccionIP: params[:direccionIP], SO: params[:SO], motorBase: params[:motorBase])
-      render json: "Actualizado exitosamente"
+      render json: {message: "Actualizado exitosamente"}
     else
       render json:{error: "No se pudo actualizar"}
     end
@@ -46,7 +50,9 @@ class Api::V1::ServidorController < ApplicationController
     @servidor = Servidor.find(params[:id])
     if @servidor
       @servidor.destroy
-      render json: "Eliminado exitosamente"
+      render json: {message: "Eliminado exitosamente"}
+    else
+      render json: { error: 'Unable to delete user', errors: user.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -54,4 +60,6 @@ class Api::V1::ServidorController < ApplicationController
     def server_params
       params.require(:servidor).permit(:nombre, :direccionIP, :SO, :motorBase)
     end
+
+    
 end
