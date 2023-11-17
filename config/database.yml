@@ -84,6 +84,7 @@ test:
 #
 production:
   <<: *default
+  url: <%= ENV['DATABASE_URL'] %>
   database: backendCore_production
   username: backendCore
   password: <%= ENV["BACKENDCORE_DATABASE_PASSWORD"] %>
