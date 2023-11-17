@@ -9,19 +9,13 @@ class ApplicationController < ActionController::API
   def process_token
       if request.headers['Authorization'].present?
         begin
-          secret_key_base = Rails.application.credentials.secret_key_base
           jwt_payload = JWT.decode(request.headers['Authorization'].split(' ')[1], Rails.application.secrets.secret_key_base).first
           @current_user_id = jwt_payload['id']
           @current_user_role = jwt_payload['role']
-          rescue JWT::ExpiredSignature
-            head :unauthorized
-          end
-          rescue JWT::VerificationError
-            head :VerificationError
-          end
-          rescue JWT::DecodeError
-            head :decode
-          end
+        rescue JWT::ExpiredSignature
+          head :unauthorized and return
+        rescue JWT::VerificationError, JWT::DecodeError => e
+          render json: { error: "Invalid token: #{e.message}" }, status: :unauthorized and return
         end
       end
   end
