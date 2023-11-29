@@ -52,7 +52,7 @@ class Api::V1::ServidorController < ApplicationController
       @servidor.destroy
       render json: {message: "Eliminado exitosamente"}
     else
-      render json: { error: 'Unable to delete user', errors: user.errors.full_messages }, status: :unprocessable_entity
+      render json: { error: 'No se pudo eliminar el servidor', errors: user.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
