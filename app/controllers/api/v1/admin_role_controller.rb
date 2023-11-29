@@ -1,7 +1,7 @@
 class Api::V1::AdminRoleController < ApplicationController
   def index
-    @admin_role = User.all
-    render json: @admin_role, status: 200
+    @admin_role = User.all()
+    render json: @admin_role.as_json(only: [:id, :email, :role]), status: 200
   end
 
   def show
@@ -18,7 +18,7 @@ class Api::V1::AdminRoleController < ApplicationController
   end
 
   def update
-    @admin_role = AdminRole.find(params[:id])
+    @admin_role = User.find(params[:id])
     if @admin_role
       @admin_role.update(role: params[:role])
       render json: {message: "Actualizado exitosamente"}
