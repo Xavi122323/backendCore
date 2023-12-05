@@ -1,7 +1,7 @@
 class Api::V1::ServidorController < ApplicationController
 
   before_action :authenticate_user!, except: [:index, :show]
-  before_action :authenticate_admin!, only: [:destroy]
+  before_action :authenticate_dba!, only: [:update, :create, :destroy]
 
   def index
     @servidor = Servidor.all()
