@@ -35,7 +35,16 @@ class ApplicationController < ActionController::API
   end
 
   def signed_in_admin?
-      @current_user_id.present? && @current_user_role == "1"
+      @current_user_id.present? && @current_user_role == 1
+  end
+
+  def authenticate_dba!(options = {})
+      #head :unauthorized unless signed_in?
+      head :unauthorized unless signed_in_dba?
+  end
+
+  def signed_in_dba?
+      @current_user_id.present? && @current_user_role == 2
   end
 
   def current_user
