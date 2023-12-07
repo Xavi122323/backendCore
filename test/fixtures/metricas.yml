@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  usoCPU: 1.5
+  usoMemoria: 1.5
+  usoAlmacenamiento: 1.5
+  fechaRecoleccion: 2023-12-06 19:19:41
+  servidor: one
+
+two:
+  usoCPU: 1.5
+  usoMemoria: 1.5
+  usoAlmacenamiento: 1.5
+  fechaRecoleccion: 2023-12-06 19:19:41
+  servidor: two
