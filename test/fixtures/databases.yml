@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  nombre: MyString
+  transaccionesDia: 1
+  transaccionesMes: 1
+  servidor: one
+
+two:
+  nombre: MyString
+  transaccionesDia: 1
+  transaccionesMes: 1
+  servidor: two

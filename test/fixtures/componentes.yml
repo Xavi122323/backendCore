@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  nroCPU: 1
+  memoria: 1
+  almacenamiento: 1
+  servidor: one
+
+two:
+  nroCPU: 1
+  memoria: 1
+  almacenamiento: 1
+  servidor: two
