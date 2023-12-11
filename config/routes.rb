@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       root "servidor#index"
       resources :servidor, only:[:index, :show, :create, :update, :destroy]
       resources :admin_role, only:[:index, :show, :create, :update, :destroy]
+      resources :componente, only:[:index, :show, :create, :update, :destroy]
       devise_scope :user do
         post "sign_up", to: "registrations#create"
         post "sign_in", to: "sessions#create"

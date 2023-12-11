@@ -21,7 +21,10 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
       resource '/api/v1/registrations',
         headers: :any,
         methods: [:get, :post, :put, :patch, :delete, :options, :head]
-        resource '/api/v1/admin_role',
+      resource '/api/v1/admin_role',
+        headers: :any,
+        methods: [:get, :post, :put, :patch, :delete, :options, :head]
+      resource '/api/v1/componente',
         headers: :any,
         methods: [:get, :post, :put, :patch, :delete, :options, :head]
     end

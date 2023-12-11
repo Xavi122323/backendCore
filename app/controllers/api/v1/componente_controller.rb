@@ -4,8 +4,11 @@ class Api::V1::ComponenteController < ApplicationController
   before_action :authenticate_dba!, only: [:update, :create, :destroy]
 
   def index
-    @componente = Componente.all()
-    render json:@componente, status: 200
+    @componente = Componente.includes(:servidor).all()
+    #render json:@componente.as_json(include: :servidor), status: 200
+    render json: @componente.map { |componente|
+      componente.as_json.merge({ server_name: componente.servidor.nombre })
+    }
   end
 
   def show
@@ -23,10 +26,10 @@ class Api::V1::ComponenteController < ApplicationController
 
   def create
     @componente = Componente.new(
-      nombre: component_params[:nroCPU], 
-      direccionIP: component_params[:memoria], 
-      SO: component_params[:almacenamiento],
-      motorBase: component_params[:server_id])
+      nroCPU: component_params[:nroCPU], 
+      memoria: component_params[:memoria], 
+      almacenamiento: component_params[:almacenamiento],
+      servidor_id: component_params[:servidor_id])
 
     if @componente.save
       render json:@componente, status:200
@@ -39,7 +42,7 @@ class Api::V1::ComponenteController < ApplicationController
     @componente = Componente.find(params[:id])
 
     if @componente
-      @componente.update(nroCPU: params[:nroCPU], memoria: params[:memoria], almacenamiento: params[:almacenamiento], server_id: params[:server_id])
+      @componente.update(nroCPU: params[:nroCPU], memoria: params[:memoria], almacenamiento: params[:almacenamiento], servidor_id: params[:servidor_id])
       render json: {message: "Actualizado exitosamente"}
     else
       render json:{error: "No se pudo actualizar"}
@@ -58,6 +61,6 @@ class Api::V1::ComponenteController < ApplicationController
 
   private
     def component_params
-      params.require(:componente).permit(:nroCPU, :memoria, :almacenamiento, :server_id)
+      params.require(:componente).permit(:nroCPU, :memoria, :almacenamiento, :servidor_id)
     end
 end
