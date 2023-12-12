@@ -62,7 +62,7 @@ class Api::V1::MetricaController < ApplicationController
 
   private
     def metrica_params
-      params.require(:Metrica).permit(:usoCPU, :usoMemoria, :usoAlmacenamiento, :fechaRecoleccion, :servidor_id)
+      params.require(:metrica).permit(:usoCPU, :usoMemoria, :usoAlmacenamiento, :fechaRecoleccion, :servidor_id)
     end
 
 end
