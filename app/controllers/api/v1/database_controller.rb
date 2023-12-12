@@ -16,7 +16,7 @@ class Api::V1::DatabaseController < ApplicationController
     if @database
       render json:@database, status: 200
     else
-      render json: {error: "Database no encontrado"}
+      render json: {error: "Base no encontrada"}
     end
   end
 
@@ -42,7 +42,7 @@ class Api::V1::DatabaseController < ApplicationController
     @database = Database.find(params[:id])
 
     if @database
-      @database.update(nombre: params[:nombre], transaccionesDia: params[:transaccionesDia], almacenatransaccionesMesmiento: params[:transaccionesMes], servidor_id: params[:servidor_id])
+      @database.update(nombre: params[:nombre], transaccionesDia: params[:transaccionesDia], transaccionesMes: params[:transaccionesMes], servidor_id: params[:servidor_id])
       render json: {message: "Actualizado exitosamente"}
     else
       render json:{error: "No se pudo actualizar"}
@@ -55,7 +55,7 @@ class Api::V1::DatabaseController < ApplicationController
       @database.destroy
       render json: {message: "Eliminado exitosamente"}
     else
-      render json: { error: 'No se pudo eliminar el Database', errors: user.errors.full_messages }, status: :unprocessable_entity
+      render json: { error: 'No se pudo eliminar la Base', errors: user.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
