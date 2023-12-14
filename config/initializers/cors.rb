@@ -33,5 +33,8 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
       resource '/api/v1/metrica',
         headers: :any,
         methods: [:get, :post, :put, :patch, :delete, :options, :head]
+      resource '/api/v1/consultas',
+        headers: :any,
+        methods: [:get, :post, :put, :patch, :delete, :options, :head]
     end
   end

@@ -17,6 +17,8 @@ Rails.application.routes.draw do
       resources :componente, only:[:index, :show, :create, :update, :destroy]
       resources :database, only:[:index, :show, :create, :update, :destroy]
       resources :metrica, only:[:index, :show, :create, :update, :destroy]
+      resources :consultas, only:[:index, :show, :create, :update, :destroy, :uso_cpu_promedio]
+      get 'uso_cpu_promedio', to: 'consultas#uso_cpu_promedio'
       devise_scope :user do
         post "sign_up", to: "registrations#create"
         post "sign_in", to: "sessions#create"
