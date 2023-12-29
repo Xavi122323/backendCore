@@ -5,7 +5,15 @@ class Api::V1::DatabaseController < ApplicationController
 
   def index
     @database = Database.includes(:servidor).all()
-    #render json:@database.as_json(include: :servidor), status: 200
+    
+    if params[:servidor]
+      @database = @database.joins(:servidor).where("servidors.nombre LIKE ?", "%#{params[:servidor]}%")
+    end
+
+    if params[:nombre]
+      @database = @database.where("databases.nombre LIKE ?", "%#{params[:nombre]}%")
+    end
+
     render json: @database.map { |database|
       database.as_json.merge({ server_name: database.servidor.nombre })
     }

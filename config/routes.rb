@@ -20,6 +20,8 @@ Rails.application.routes.draw do
       resources :consultas, only:[:index, :show, :create, :update, :destroy, :uso_cpu_promedio]
       get 'uso_cpu_promedio', to: 'consultas#uso_cpu_promedio'
       get 'cpu_fechas', to: 'consultas#cpu_fechas'
+      get 'uso_memoria_promedio', to: 'consultas#uso_memoria_promedio'
+      get 'memoria_fechas', to: 'consultas#memoria_fechas'
       devise_scope :user do
         post "sign_up", to: "registrations#create"
         post "sign_in", to: "sessions#create"

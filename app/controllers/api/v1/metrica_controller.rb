@@ -5,7 +5,16 @@ class Api::V1::MetricaController < ApplicationController
 
   def index
     @metrica = Metrica.includes(:servidor).all()
-    #render json:@metrica.as_json(include: :servidor), status: 200
+    
+    if params[:servidor]
+      @metrica = @metrica.joins(:servidor).where("servidors.nombre LIKE ?", "%#{params[:servidor]}%")
+    end
+
+    if params[:fechaRecoleccion]
+      date = Date.parse(params[:fechaRecoleccion])
+      @metrica = @metrica.where('CAST("fechaRecoleccion" AS DATE) = ?', date)
+    end
+
     render json: @metrica.map { |metrica|
       metrica.as_json.merge({ server_name: metrica.servidor.nombre })
     }

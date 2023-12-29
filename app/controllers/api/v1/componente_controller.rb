@@ -5,7 +5,11 @@ class Api::V1::ComponenteController < ApplicationController
 
   def index
     @componente = Componente.includes(:servidor).all()
-    #render json:@componente.as_json(include: :servidor), status: 200
+    
+    if params[:servidor]
+      @componente = @componente.joins(:servidor).where("servidors.nombre LIKE ?", "%#{params[:servidor]}%")
+    end
+
     render json: @componente.map { |componente|
       componente.as_json.merge({ server_name: componente.servidor.nombre })
     }

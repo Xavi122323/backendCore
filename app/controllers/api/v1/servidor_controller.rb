@@ -5,6 +5,11 @@ class Api::V1::ServidorController < ApplicationController
 
   def index
     @servidor = Servidor.all()
+  
+    if params[:nombre]
+      @servidor = @servidor.where("nombre LIKE ?", "%#{params[:nombre]}%")
+    end
+
     render json:@servidor, status: 200
   end
 
