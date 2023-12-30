@@ -10,7 +10,11 @@ class Api::V1::ConsultasController < ApplicationController
                           .where('"fechaRecoleccion" >= ?', start_date)
                           .where('"fechaRecoleccion" <= ?', end_date)
                           .average(:usoCPU)
-      render json: { server_id: server_id, average_cpu: average_cpu }
+      unless average_cpu.nil?
+        render json: { server_id: server_id, average_cpu: average_cpu }
+      else
+        render json: { error: "No data found for the specified criteria" }, status: :not_found
+      end
     else
       render json: { error: "Missing parameters" }, status: :bad_request
     end
@@ -50,7 +54,11 @@ class Api::V1::ConsultasController < ApplicationController
                           .where('"fechaRecoleccion" >= ?', start_date)
                           .where('"fechaRecoleccion" <= ?', end_date)
                           .average(:usoMemoria)
-      render json: { server_id: server_id, average_memoria: average_memoria }
+      unless average_memoria.nil?
+        render json: { server_id: server_id, average_memoria: average_memoria }
+      else
+        render json: { error: "No data found for the specified criteria" }, status: :not_found
+      end
     else
       render json: { error: "Missing parameters" }, status: :bad_request
     end
