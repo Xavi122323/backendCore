@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_12_07_001941) do
+ActiveRecord::Schema[7.0].define(version: 2023_12_30_174850) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -26,11 +26,11 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_07_001941) do
 
   create_table "databases", force: :cascade do |t|
     t.string "nombre"
-    t.integer "transaccionesDia"
-    t.integer "transaccionesMes"
     t.bigint "servidor_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "transacciones"
+    t.date "fechaTransaccion"
     t.index ["servidor_id"], name: "index_databases_on_servidor_id"
   end
 
@@ -38,7 +38,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_07_001941) do
     t.float "usoCPU"
     t.float "usoMemoria"
     t.float "usoAlmacenamiento"
-    t.datetime "fechaRecoleccion"
+    t.datetime "fechaRecoleccion", precision: 0
     t.bigint "servidor_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

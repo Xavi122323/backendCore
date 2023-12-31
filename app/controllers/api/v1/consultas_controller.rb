@@ -88,4 +88,28 @@ class Api::V1::ConsultasController < ApplicationController
     end
   end
 
+  def suma_transacciones
+    sum = Database.sum_transacciones_por_criterios(
+      nombres: params[:nombres],
+      servidor_id: params[:servidor_id],
+      start_date: params[:start_date],
+      end_date: params[:end_date]
+    )
+  
+    render json: { sum: sum }
+  end
+
+  def transacciones_totales
+    transaction_data = Database.transacciones_totales_por_database(
+      nombres: params[:nombres],
+      servidor_id: params[:servidor_id],
+      start_date: params[:start_date],
+      end_date: params[:end_date]
+    ).map do |nombre, total_transacciones|
+      { nombre: nombre, total_transacciones: total_transacciones }
+    end
+
+    render json: transaction_data
+  end
+
 end

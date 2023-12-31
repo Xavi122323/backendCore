@@ -22,6 +22,8 @@ Rails.application.routes.draw do
       get 'cpu_fechas', to: 'consultas#cpu_fechas'
       get 'uso_memoria_promedio', to: 'consultas#uso_memoria_promedio'
       get 'memoria_fechas', to: 'consultas#memoria_fechas'
+      get 'sumaTransacciones', to: 'consultas#suma_transacciones'
+      get 'transaccionesTotales', to: 'consultas#transacciones_totales'
       devise_scope :user do
         post "sign_up", to: "registrations#create"
         post "sign_in", to: "sessions#create"

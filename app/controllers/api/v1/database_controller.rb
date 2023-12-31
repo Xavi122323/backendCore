@@ -35,8 +35,8 @@ class Api::V1::DatabaseController < ApplicationController
   def create
     @database = Database.new(
       nombre: database_params[:nombre], 
-      transaccionesDia: database_params[:transaccionesDia], 
-      transaccionesMes: database_params[:transaccionesMes],
+      transacciones: database_params[:transacciones], 
+      fechaTransaccion: database_params[:fechaTransaccion],
       servidor_id: database_params[:servidor_id])
 
     if @database.save
@@ -50,7 +50,7 @@ class Api::V1::DatabaseController < ApplicationController
     @database = Database.find(params[:id])
 
     if @database
-      @database.update(nombre: params[:nombre], transaccionesDia: params[:transaccionesDia], transaccionesMes: params[:transaccionesMes], servidor_id: params[:servidor_id])
+      @database.update(nombre: params[:nombre], transacciones: params[:transacciones], fechaTransaccion: params[:fechaTransaccion], servidor_id: params[:servidor_id])
       render json: {message: "Actualizado exitosamente"}
     else
       render json:{error: "No se pudo actualizar"}
@@ -69,7 +69,7 @@ class Api::V1::DatabaseController < ApplicationController
 
   private
     def database_params
-      params.require(:database).permit(:nombre, :transaccionesDia, :transaccionesMes, :servidor_id)
+      params.require(:database).permit(:nombre, :transacciones, :fechaTransaccion, :servidor_id)
     end
 
 end
