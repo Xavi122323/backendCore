@@ -14,6 +14,16 @@ class Api::V1::DatabaseController < ApplicationController
       @database = @database.where("databases.nombre LIKE ?", "%#{params[:nombre]}%")
     end
 
+    if params[:fechaRecoleccion]
+      date = Date.parse(params[:fechaRecoleccion])
+      @database = @database.where('CAST("fechaTransaccion" AS DATE) = ?', date)
+    end
+
+    if params[:unique_names]
+    unique_names = @database.pluck(:nombre).uniq
+    render json: unique_names and return
+  end
+
     render json: @database.map { |database|
       database.as_json.merge({ server_name: database.servidor.nombre })
     }

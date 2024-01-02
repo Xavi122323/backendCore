@@ -95,8 +95,13 @@ class Api::V1::ConsultasController < ApplicationController
       start_date: params[:start_date],
       end_date: params[:end_date]
     )
-  
-    render json: { sum: sum }
+
+    if sum == 'no_data'
+      render json: { error: 'No data available for the given criteria' }, status: :not_found
+    else
+      render json: { sum: sum }
+    end
+
   end
 
   def transacciones_totales
@@ -105,11 +110,18 @@ class Api::V1::ConsultasController < ApplicationController
       servidor_id: params[:servidor_id],
       start_date: params[:start_date],
       end_date: params[:end_date]
-    ).map do |nombre, total_transacciones|
-      { nombre: nombre, total_transacciones: total_transacciones }
+    )
+
+    if transaction_data == 'no_data'
+      render json: { error: 'No data available for the given criteria' }, status: :not_found
+    else
+      transacciones = transaction_data.map do |nombre, total_transacciones|
+        { nombre: nombre, total_transacciones: total_transacciones }
+      end
+      render json: transacciones, status: 200
     end
 
-    render json: transaction_data
+    #render json: transaction_data
   end
 
 end
