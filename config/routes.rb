@@ -24,6 +24,7 @@ Rails.application.routes.draw do
       get 'memoria_fechas', to: 'consultas#memoria_fechas'
       get 'sumaTransacciones', to: 'consultas#suma_transacciones'
       get 'transaccionesTotales', to: 'consultas#transacciones_totales'
+      post 'compare', to: 'consultas#compare'
       devise_scope :user do
         post "sign_up", to: "registrations#create"
         post "sign_in", to: "sessions#create"

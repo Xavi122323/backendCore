@@ -34,28 +34,22 @@ class Api::V1::MetricaController < ApplicationController
   end
 
   def create
-    @metrica = Metrica.new(
-      usoCPU: metrica_params[:usoCPU], 
-      usoMemoria: metrica_params[:usoMemoria], 
-      usoAlmacenamiento: metrica_params[:usoAlmacenamiento],
-      fechaRecoleccion: metrica_params[:fechaRecoleccion],
-      servidor_id: metrica_params[:servidor_id])
+    @metrica = Metrica.new(metrica_params_with_parsed_date)
 
     if @metrica.save
-      render json:@metrica, status:200
+      render json: @metrica, status: :created
     else
-      render json:{error: "No se pudo ingresar"}
+      render json: { errors: @metrica.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
   def update
     @metrica = Metrica.find(params[:id])
 
-    if @metrica
-      @metrica.update(usoCPU: params[:usoCPU], usoMemoria: params[:usoMemoria], usoAlmacenamiento: params[:usoAlmacenamiento], fechaRecoleccion: params[:fechaRecoleccion], servidor_id: params[:servidor_id])
-      render json: {message: "Actualizado exitosamente"}
+    if @metrica.update(metrica_params_with_parsed_date)
+      render json: { message: "Actualizado exitosamente" }
     else
-      render json:{error: "No se pudo actualizar"}
+      render json: { error: "No se pudo actualizar", errors: @metrica.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -70,8 +64,17 @@ class Api::V1::MetricaController < ApplicationController
   end
 
   private
-    def metrica_params
-      params.require(:metrica).permit(:usoCPU, :usoMemoria, :usoAlmacenamiento, :fechaRecoleccion, :servidor_id)
+
+  def metrica_params
+    params.permit(:usoCPU, :usoMemoria, :usoAlmacenamiento, :fechaRecoleccion, :servidor_id)
+  end
+
+  def metrica_params_with_parsed_date
+    metrica_parameters = metrica_params
+    if metrica_parameters[:fechaRecoleccion].present?
+      metrica_parameters[:fechaRecoleccion] = DateTime.parse(metrica_parameters[:fechaRecoleccion])
     end
+    metrica_parameters
+  end
 
 end

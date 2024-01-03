@@ -124,4 +124,55 @@ class Api::V1::ConsultasController < ApplicationController
     #render json: transaction_data
   end
 
+  def compare
+    server_ids = comparison_params[:server_ids]
+    start_date = comparison_params[:start_date]
+    end_date = comparison_params[:end_date]
+    params_to_compare = comparison_params[:params]
+
+    if server_ids.empty? || params_to_compare.empty?
+      render json: { error: 'Missing required parameters' }, status: :bad_request
+      return
+    end
+
+    @comparison_results = server_ids.map do |id|
+      server = Servidor.find_by(id: id)
+      return render json: { error: "Server with id #{id} not found" }, status: :not_found unless server
+
+      metrics = server.metricas.where(fechaRecoleccion: start_date..end_date)
+      {
+        servidor: server.nombre,
+        cpu_usage: include_param?('CPU', params_to_compare) ? metrics_data(metrics, :usoCPU) : nil,
+        memoria_usage: include_param?('Memoria', params_to_compare) ? metrics_data(metrics, :usoMemoria) : nil,
+        almacenamiento_usage: include_param?('Almacenamiento', params_to_compare) ? metrics_data(metrics, :usoAlmacenamiento) : nil,
+        transacciones: include_param?('Transacciones', params_to_compare) ? transaction_data(server, start_date, end_date) : nil
+      }
+    end
+
+    render json: @comparison_results, status: :ok
+  end
+
+  private
+
+  def metrics_data(metrics, field)
+    return 'no_data' if metrics.empty?
+    average_metric(metrics, field)
+  end
+
+  def transaction_data(server, start_date, end_date)
+    server.databases.where(fechaTransaccion: start_date..end_date).sum(:transacciones)
+  end
+
+  def include_param?(param, params_to_compare)
+    params_to_compare.include?(param)
+  end
+
+  def average_metric(metrics, field)
+    metrics.average(field).to_f.round(2)
+  end
+
+  def comparison_params
+    params.require(:comparison).permit(:start_date, :end_date, params: [], server_ids: [])
+  end
+
 end
