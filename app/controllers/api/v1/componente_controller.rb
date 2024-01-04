@@ -10,9 +10,17 @@ class Api::V1::ComponenteController < ApplicationController
       @componente = @componente.joins(:servidor).where("servidors.nombre LIKE ?", "%#{params[:servidor]}%")
     end
 
-    render json: @componente.map { |componente|
-      componente.as_json.merge({ server_name: componente.servidor.nombre })
+    page = params[:page] || 1
+    per_page = params[:limit] || 10
+    total_count = @componente.count
+
+    @componente = @componente.page(page).per(per_page)
+
+    render json: {
+      componentes: @componente.map { |componente| componente.as_json.merge({ server_name: componente.servidor.nombre }) },
+      total_count: total_count
     }
+    
   end
 
   def show

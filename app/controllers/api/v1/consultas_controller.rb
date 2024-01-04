@@ -129,28 +129,84 @@ class Api::V1::ConsultasController < ApplicationController
     start_date = comparison_params[:start_date]
     end_date = comparison_params[:end_date]
     params_to_compare = comparison_params[:params]
-
+  
     if server_ids.empty? || params_to_compare.empty?
       render json: { error: 'Missing required parameters' }, status: :bad_request
       return
     end
-
+  
+    most_transactions = { server_name: nil, transaction_count: 0 }
+    least_efficient_memory = []
+  
     @comparison_results = server_ids.map do |id|
       server = Servidor.find_by(id: id)
-      return render json: { error: "Server with id #{id} not found" }, status: :not_found unless server
-
+      unless server
+        render json: { error: "Server with id #{id} not found" }, status: :not_found
+        next
+      end
+  
       metrics = server.metricas.where(fechaRecoleccion: start_date..end_date)
-      {
+      server_result = {
         servidor: server.nombre,
         cpu_usage: include_param?('CPU', params_to_compare) ? metrics_data(metrics, :usoCPU) : nil,
         memoria_usage: include_param?('Memoria', params_to_compare) ? metrics_data(metrics, :usoMemoria) : nil,
         almacenamiento_usage: include_param?('Almacenamiento', params_to_compare) ? metrics_data(metrics, :usoAlmacenamiento) : nil,
         transacciones: include_param?('Transacciones', params_to_compare) ? transaction_data(server, start_date, end_date) : nil
       }
+  
+      # Update most transactions and least efficient memory usage
+      total_transactions = server_result[:transacciones]
+      if total_transactions && total_transactions > most_transactions[:transaction_count]
+        most_transactions = { server_name: server.nombre, transaction_count: total_transactions }
+      end
+  
+      avg_memory_usage = server_result[:memoria_usage]
+      if avg_memory_usage && avg_memory_usage != 'no_data'
+        least_efficient_memory << { server_name: server.nombre, average_memory_usage: avg_memory_usage }
+      end
+  
+      server_result
     end
-
-    render json: @comparison_results, status: :ok
+  
+    # Sort the memory usage data
+    least_efficient_memory.sort_by! { |data| -data[:average_memory_usage] }
+  
+    # Comparing each server with every other server
+    server_comparisons = []
+    server_ids.combination(2).each do |id1, id2|
+      server1 = @comparison_results.find { |result| result[:servidor] == Servidor.find_by(id: id1).nombre }
+      server2 = @comparison_results.find { |result| result[:servidor] == Servidor.find_by(id: id2).nombre }
+    
+      # Skip comparison if one of the servers is missing in the results
+      next unless server1 && server2
+    
+      # Calculate differences
+      transaction_difference = (server1[:transacciones] - server2[:transacciones]).abs
+      memory_difference = (server1[:memoria_usage].to_f - server2[:memoria_usage].to_f).abs
+    
+      server_comparisons << {
+        server1: server1[:servidor],
+        server2: server2[:servidor],
+        transaction_difference: transaction_difference,
+        memory_difference: memory_difference
+      }
+    end
+  
+    # Summary for most transactions and least efficient memory use
+    comparison_summary = {
+      most_transactions: most_transactions,
+      least_efficient_memory: least_efficient_memory.take(3)
+    }
+  
+    # Render the final JSON response
+    render json: { 
+      comparison_results: @comparison_results.compact, 
+      summary: comparison_summary, 
+      server_comparisons: server_comparisons 
+    }, status: :ok
   end
+  
+  
 
   private
 

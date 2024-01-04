@@ -19,14 +19,33 @@ class Api::V1::DatabaseController < ApplicationController
       @database = @database.where('CAST("fechaTransaccion" AS DATE) = ?', date)
     end
 
-    if params[:unique_names]
-    unique_names = @database.pluck(:nombre).uniq
-    render json: unique_names and return
-  end
+    if params[:servidor_id].present?
+      @database = @database.where(servidors: { id: params[:servidor_id] })
+    end
+  
+    if params[:unique_names].present?
 
-    render json: @database.map { |database|
-      database.as_json.merge({ server_name: database.servidor.nombre })
+      unique_databases = @database.map do |database|
+        {
+          nombre: database.nombre,
+          server_id: database.servidor.id
+        }
+      end.uniq { |db| db[:nombre] }
+  
+      render json: unique_databases and return
+    end
+  
+    page = params[:page] || 1
+    per_page = params[:limit] || 10
+    total_count = @database.count
+
+    @database = @database.page(page).per(per_page)
+
+    render json: {
+      databases: @database.map { |database| database.as_json.merge({ server_name: database.servidor.nombre }) },
+      total_count: total_count
     }
+    
   end
 
   def show

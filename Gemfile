@@ -53,3 +53,5 @@ gem "devise"
 
 
 gem 'jwt'
+
+gem 'kaminari'

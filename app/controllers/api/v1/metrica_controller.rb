@@ -9,14 +9,21 @@ class Api::V1::MetricaController < ApplicationController
     if params[:servidor]
       @metrica = @metrica.joins(:servidor).where("servidors.nombre LIKE ?", "%#{params[:servidor]}%")
     end
-
+  
     if params[:fechaRecoleccion]
       date = Date.parse(params[:fechaRecoleccion])
       @metrica = @metrica.where('CAST("fechaRecoleccion" AS DATE) = ?', date)
     end
-
-    render json: @metrica.map { |metrica|
-      metrica.as_json.merge({ server_name: metrica.servidor.nombre })
+  
+    page = params[:page] || 1
+    per_page = params[:limit] || 10
+    total_count = @metrica.count
+  
+    @metrica = @metrica.page(page).per(per_page)
+  
+    render json: {
+      metricas: @metrica.map { |metrica| metrica.as_json.merge({ server_name: metrica.servidor.nombre }) },
+      total_count: total_count
     }
   end
 
