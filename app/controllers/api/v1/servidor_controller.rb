@@ -5,7 +5,20 @@ class Api::V1::ServidorController < ApplicationController
 
   def index
     @servidor = Servidor.all()
-    render json:@servidor, status: 200
+  
+    if params[:nombre]
+      @servidor = @servidor.where("nombre LIKE ?", "%#{params[:nombre]}%")
+    end
+
+    page = params[:page] || 1
+    per_page = params[:limit] || 10
+
+    @servidor = @servidor.page(page).per(per_page)
+
+    render json: {
+      servidores: @servidor,
+      total_count: @servidor.total_count
+    }
   end
 
   def show
