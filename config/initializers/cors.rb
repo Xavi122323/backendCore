@@ -11,7 +11,9 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
       "frontend-core-git-master-xavi122323s-projects.vercel.app", 
       "frontend-core-q44aeqw2q-xavi122323s-projects.vercel.app",
       "https://adrianbedon.github.io/front-react/",
-      "https://adrianbedon.github.io"
+      "https://adrianbedon.github.io/",
+      "adrianbedon.github.io/front-react/",
+      "adrianbedon.github.io"
  
       resource "*",
         headers: :any,
