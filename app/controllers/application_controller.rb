@@ -1,54 +1,46 @@
-class ApplicationController < ActionController::API
+require 'net/http'
+require 'uri'
+require 'json'
+require 'jwt'
 
+class ApplicationController < ActionController::API
   respond_to :json
 
-  before_action :process_token
+  before_action :authenticate_user!
 
   private
 
-  def process_token
-      if request.headers['Authorization'].present?
-        begin
-          jwt_payload = JWT.decode(request.headers['Authorization'].split(' ')[1], Rails.application.credentials.secret_key_base).first
-          @current_user_id = jwt_payload['id']
-          @current_user_role = jwt_payload['role']
-        rescue JWT::ExpiredSignature
-          head :unauthorized and return
-        rescue JWT::VerificationError, JWT::DecodeError => e
-          render json: { error: "Invalid token: #{e.message}" }, status: :unauthorized and return
+  def authenticate_user!
+    token = request.headers['Authorization']&.split(' ')&.last
+    if token
+      begin
+        options = { algorithm: 'RS256', iss: 'https://cloak.mindsoftdev.com:8443/auth/realms/external', verify_iss: true }
+        payload, _header = JWT.decode(token, nil, true, options) do |header|
+          jwks_hash[header['kid']]
         end
+        @current_user = User.find_or_create_by(email: payload['email']) do |user|
+          user.name = payload['name']
+          user.role = payload['role']
+        end
+      rescue JWT::DecodeError => e
+        render json: { error: e.message }, status: :unauthorized
       end
+    else
+      render json: { error: 'Missing token' }, status: :unauthorized
+    end
   end
 
-  def authenticate_user!(options = {})
-      #head :unauthorized unless signed_in?
-      head :unauthorized unless signed_in?
+  def jwks_hash
+    jwks_raw = Net::HTTP.get URI('https://cloak.mindsoftdev.com:8443/auth/realms/external/protocol/openid-connect/certs')
+    jwks_keys = Array(JSON.parse(jwks_raw)['keys'])
+    Hash[
+      jwks_keys
+        .map do |k|
+          [
+            k['kid'],
+            OpenSSL::X509::Certificate.new(Base64.decode64(k['x5c'].first)).public_key
+          ]
+        end
+    ]
   end
-
-  def signed_in?
-      @current_user_id.present?
-  end
-
-  def authenticate_admin!(options = {})
-      #head :unauthorized unless signed_in?
-      head :unauthorized unless signed_in_admin?
-  end
-
-  def signed_in_admin?
-      @current_user_id.present? && @current_user_role == 1
-  end
-
-  def authenticate_dba!(options = {})
-      #head :unauthorized unless signed_in?
-      head :unauthorized unless signed_in_dba?
-  end
-
-  def signed_in_dba?
-      @current_user_id.present? && @current_user_role == 2
-  end
-
-  def current_user
-      @current_user ||= super || User.find(@current_user_id)
-  end
-
 end
