@@ -1,11 +1,12 @@
 class Api::V1::ServidorController < ApplicationController
 
   before_action :authenticate_user!, except: [:index, :show]
+  
   before_action :authenticate_dba!, only: [:update, :create, :destroy]
 
   def index
-    @servidor = Servidor.all()
-  
+    @servidor = Servidor.all
+
     if params[:nombre]
       @servidor = @servidor.where("nombre LIKE ?", "%#{params[:nombre]}%")
     end
@@ -35,11 +36,7 @@ class Api::V1::ServidorController < ApplicationController
   end
 
   def create
-    @servidor = Servidor.new(
-      nombre: server_params[:nombre], 
-      direccionIP: server_params[:direccionIP], 
-      SO: server_params[:SO],
-      motorBase: server_params[:motorBase])
+    @servidor = Servidor.new(server_params)
 
     if @servidor.save
       render json:@servidor, status:200
@@ -51,8 +48,7 @@ class Api::V1::ServidorController < ApplicationController
   def update
     @servidor = Servidor.find(params[:id])
 
-    if @servidor
-      @servidor.update(nombre: params[:nombre], direccionIP: params[:direccionIP], SO: params[:SO], motorBase: params[:motorBase])
+    if @servidor.update(server_params)
       render json: {message: "Actualizado exitosamente"}
     else
       render json:{error: "No se pudo actualizar"}
@@ -61,11 +57,10 @@ class Api::V1::ServidorController < ApplicationController
 
   def destroy
     @servidor = Servidor.find(params[:id])
-    if @servidor
-      @servidor.destroy
+    if @servidor.destroy
       render json: {message: "Eliminado exitosamente"}
     else
-      render json: { error: 'No se pudo eliminar el servidor', errors: user.errors.full_messages }, status: :unprocessable_entity
+      render json: { error: 'No se pudo eliminar el servidor', errors: @servidor.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -73,6 +68,4 @@ class Api::V1::ServidorController < ApplicationController
     def server_params
       params.require(:servidor).permit(:nombre, :direccionIP, :SO, :motorBase)
     end
-
-    
 end
