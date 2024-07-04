@@ -14,7 +14,7 @@ class KeycloakService
         password: password
       },
       headers: { accept: :json },
-      verify_ssl: false # Ignorar verificación SSL
+      verify_ssl: false
     )
     JSON.parse(response.body)
   rescue RestClient::ExceptionWithResponse => e
