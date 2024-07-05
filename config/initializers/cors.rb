@@ -10,8 +10,7 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
       origins "http://localhost:4200", "frontend-core-blue.vercel.app", 
       "frontend-core-git-master-xavi122323s-projects.vercel.app", 
       "frontend-core-q44aeqw2q-xavi122323s-projects.vercel.app",
-      "https://adrianbedon.github.io/front-react/",
-      "https://adrianbedon.github.io/",
+      "https://front-react-keycloak.vercel.app",
       "http://localhost:5173"
  
       resource "*",
