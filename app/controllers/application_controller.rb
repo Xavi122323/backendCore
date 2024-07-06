@@ -1,5 +1,4 @@
 class ApplicationController < ActionController::API
-
   respond_to :json
 
   before_action :process_token
@@ -7,48 +6,26 @@ class ApplicationController < ActionController::API
   private
 
   def process_token
-      if request.headers['Authorization'].present?
-        begin
-          jwt_payload = JWT.decode(request.headers['Authorization'].split(' ')[1], Rails.application.credentials.secret_key_base).first
-          @current_user_id = jwt_payload['id']
-          @current_user_role = jwt_payload['role']
-        rescue JWT::ExpiredSignature
-          head :unauthorized and return
-        rescue JWT::VerificationError, JWT::DecodeError => e
-          render json: { error: "Invalid token: #{e.message}" }, status: :unauthorized and return
-        end
+    if request.headers['Authorization'].present?
+      token = request.headers['Authorization'].split(' ').last
+      jwt_payload = KeycloakService.decode_token(token)
+      if jwt_payload
+        @current_user_id = jwt_payload['sub']
+      else
+        head :unauthorized
       end
+    end
   end
 
   def authenticate_user!(options = {})
-      #head :unauthorized unless signed_in?
-      head :unauthorized unless signed_in?
+    head :unauthorized unless signed_in?
   end
 
   def signed_in?
-      @current_user_id.present?
-  end
-
-  def authenticate_admin!(options = {})
-      #head :unauthorized unless signed_in?
-      head :unauthorized unless signed_in_admin?
-  end
-
-  def signed_in_admin?
-      @current_user_id.present? && @current_user_role == 1
-  end
-
-  def authenticate_dba!(options = {})
-      #head :unauthorized unless signed_in?
-      head :unauthorized unless signed_in_dba?
-  end
-
-  def signed_in_dba?
-      @current_user_id.present? && @current_user_role == 2
+    @current_user_id.present?
   end
 
   def current_user
-      @current_user ||= super || User.find(@current_user_id)
+    @current_user ||= User.find_by(keycloak_id: @current_user_id)
   end
-
 end
