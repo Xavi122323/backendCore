@@ -1,9 +1,6 @@
 class Api::V1::ServidorController < ApplicationController
-
   before_action :authenticate_user!#, except: [:index, :show]
   
-  before_action :authenticate_dba!, only: [:update, :create, :destroy]
-
   def index
     @servidor = Servidor.all
 
@@ -25,7 +22,13 @@ class Api::V1::ServidorController < ApplicationController
   def show
     @servidor = Servidor.find(params[:id])
     if @servidor
-      render json:@servidor, status: 200
+      decrypted_data = {
+        nombre: KmsService.decrypt(@servidor.nombre),
+        direccionIP: KmsService.decrypt(@servidor.direccionIP),
+        SO: KmsService.decrypt(@servidor.SO),
+        motorBase: KmsService.decrypt(@servidor.motorBase)
+      }
+      render json: decrypted_data, status: 200
     else
       render json: {error: "Servidor no encontrado"}
     end
@@ -36,22 +39,34 @@ class Api::V1::ServidorController < ApplicationController
   end
 
   def create
-    @servidor = Servidor.new(server_params)
+    encrypted_params = {
+      nombre: KmsService.encrypt(server_params[:nombre]),
+      direccionIP: KmsService.encrypt(server_params[:direccionIP]),
+      SO: KmsService.encrypt(server_params[:SO]),
+      motorBase: KmsService.encrypt(server_params[:motorBase])
+    }
+    @servidor = Servidor.new(encrypted_params)
 
     if @servidor.save
-      render json:@servidor, status:200
+      render json: @servidor, status: 200
     else
-      render json:{error: "No se pudo ingresar"}
+      render json: {error: "No se pudo ingresar"}
     end
   end
 
   def update
     @servidor = Servidor.find(params[:id])
+    encrypted_params = {
+      nombre: KmsService.encrypt(server_params[:nombre]),
+      direccionIP: KmsService.encrypt(server_params[:direccionIP]),
+      SO: KmsService.encrypt(server_params[:SO]),
+      motorBase: KmsService.encrypt(server_params[:motorBase])
+    }
 
-    if @servidor.update(server_params)
+    if @servidor.update(encrypted_params)
       render json: {message: "Actualizado exitosamente"}
     else
-      render json:{error: "No se pudo actualizar"}
+      render json: {error: "No se pudo actualizar"}
     end
   end
 
@@ -60,12 +75,13 @@ class Api::V1::ServidorController < ApplicationController
     if @servidor.destroy
       render json: {message: "Eliminado exitosamente"}
     else
-      render json: { error: 'No se pudo eliminar el servidor', errors: @servidor.errors.full_messages }, status: :unprocessable_entity
+      render json: {error: 'No se pudo eliminar el servidor', errors: @servidor.errors.full_messages}, status: :unprocessable_entity
     end
   end
 
   private
-    def server_params
-      params.require(:servidor).permit(:nombre, :direccionIP, :SO, :motorBase)
-    end
+
+  def server_params
+    params.require(:servidor).permit(:nombre, :direccionIP, :SO, :motorBase)
+  end
 end
