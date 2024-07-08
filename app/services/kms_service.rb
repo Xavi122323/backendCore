@@ -1,3 +1,7 @@
+# app/services/kms_service.rb
+require "google/cloud/kms"
+require "base64"
+
 class KmsService
   PROJECT_ID = 'kmsseguridad'
   LOCATION = 'southamerica-west1'
@@ -9,16 +13,17 @@ class KmsService
   end
 
   def self.crypto_key_path
-    kms_client.crypto_key_path PROJECT_ID, LOCATION, KEYRING, KEY
+    kms_client.crypto_key_path project: PROJECT_ID, location: LOCATION, key_ring: KEYRING, crypto_key: KEY
   end
 
   def self.encrypt(plaintext)
-    response = kms_client.encrypt crypto_key_path, plaintext
-    response.ciphertext
+    response = kms_client.encrypt name: crypto_key_path, plaintext: plaintext
+    Base64.strict_encode64(response.ciphertext)
   end
 
   def self.decrypt(ciphertext)
-    response = kms_client.decrypt crypto_key_path, ciphertext
+    decoded_ciphertext = Base64.strict_decode64(ciphertext)
+    response = kms_client.decrypt name: crypto_key_path, ciphertext: decoded_ciphertext
     response.plaintext
   end
 end

@@ -1,21 +1,30 @@
 class Api::V1::ServidorController < ApplicationController
-  before_action :authenticate_user!#, except: [:index, :show]
-  
+  before_action :authenticate_user!
+
   def index
-    @servidor = Servidor.all
-
+    @servidores = Servidor.all
+  
     if params[:nombre]
-      @servidor = @servidor.where("nombre LIKE ?", "%#{params[:nombre]}%")
+      @servidores = @servidores.where("nombre LIKE ?", "%#{params[:nombre]}%")
     end
-
+  
     page = params[:page] || 1
     per_page = params[:limit] || 10
-
-    @servidor = @servidor.page(page).per(per_page)
-
+  
+    @servidores = @servidores.page(page).per(per_page)
+  
+    decrypted_servidores = @servidores.map do |servidor|
+      {
+        nombre: KmsService.decrypt(servidor.nombre),
+        direccionIP: KmsService.decrypt(servidor.direccionIP),
+        SO: KmsService.decrypt(servidor.SO),
+        motorBase: KmsService.decrypt(servidor.motorBase)
+      }
+    end
+  
     render json: {
-      servidores: @servidor,
-      total_count: @servidor.total_count
+      servidores: decrypted_servidores,
+      total_count: @servidores.total_count
     }
   end
 
@@ -77,6 +86,33 @@ class Api::V1::ServidorController < ApplicationController
     else
       render json: {error: 'No se pudo eliminar el servidor', errors: @servidor.errors.full_messages}, status: :unprocessable_entity
     end
+  end
+
+  def show_encrypted
+    @servidores = Servidor.all
+  
+    if params[:nombre]
+      @servidores = @servidores.where("nombre LIKE ?", "%#{params[:nombre]}%")
+    end
+  
+    page = params[:page] || 1
+    per_page = params[:limit] || 10
+  
+    @servidores = @servidores.page(page).per(per_page)
+  
+    encrypted_servidores = @servidores.map do |servidor|
+      {
+        nombre: servidor.nombre,
+        direccionIP: servidor.direccionIP,
+        SO: servidor.SO,
+        motorBase: servidor.motorBase
+      }
+    end
+  
+    render json: {
+      servidores: encrypted_servidores,
+      total_count: @servidores.total_count
+    }
   end
 
   private

@@ -61,4 +61,5 @@ gem 'ffi'
 
 gem 'rest-client'
 
-gem 'google-cloud-kms'
+gem 'google-cloud-kms', '~> 2.8.0'
+gem 'grpc', '~> 1.59.0'

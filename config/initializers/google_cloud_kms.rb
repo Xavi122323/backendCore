@@ -1,5 +1,2 @@
+# config/initializers/google_cloud_kms.rb
 require "google/cloud/kms"
-
-Google::Cloud::Kms.configure do |config|
-  config.project_id = "kmsseguridad"
-end

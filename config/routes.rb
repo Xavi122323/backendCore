@@ -18,6 +18,7 @@ Rails.application.routes.draw do
       resources :database, only:[:index, :show, :create, :update, :destroy]
       resources :metrica, only:[:index, :show, :create, :update, :destroy]
       resources :consultas, only:[:index, :show, :create, :update, :destroy, :uso_cpu_promedio]
+      get 'servidores_encriptados', to: 'servidor#show_encrypted'
       get 'uso_cpu_promedio', to: 'consultas#uso_cpu_promedio'
       get 'cpu_fechas', to: 'consultas#cpu_fechas'
       get 'uso_memoria_promedio', to: 'consultas#uso_memoria_promedio'
