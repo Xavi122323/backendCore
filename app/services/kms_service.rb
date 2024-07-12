@@ -1,6 +1,5 @@
-# app/services/kms_service.rb
 require "google/cloud/kms"
-require "base64"
+require "json"
 
 class KmsService
   PROJECT_ID = 'kmsseguridad'
@@ -9,7 +8,12 @@ class KmsService
   KEY = 'key_seguridad'
 
   def self.kms_client
-    @kms_client ||= Google::Cloud::Kms.key_management_service
+    credentials_json = ENV['GOOGLE_APPLICATION_CREDENTIALS_JSON']
+    credentials = JSON.parse(credentials_json)
+
+    Google::Cloud::Kms.key_management_service do |config|
+      config.credentials = credentials
+    end
   end
 
   def self.crypto_key_path
