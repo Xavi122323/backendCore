@@ -108,6 +108,8 @@ class Api::V1::ServidorController < ApplicationController
         motorBase: servidor.motorBase
       }
     end
+
+    response.headers.delete('Content-Encoding')
   
     render json: {
       servidores: encrypted_servidores,
