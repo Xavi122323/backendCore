@@ -1,7 +1,8 @@
-# config/initializers/google_cloud_kms.rb
 require "google/cloud/kms"
+require "json"
 
-credentials_json = ENV['GOOGLE_APPLICATION_CREDENTIALS_JSON']
+Rails.logger.info("GOOGLE_APPLICATION_CREDENTIALS_JSON: #{ENV['GOOGLE_APPLICATION_CREDENTIALS_JSON']}")
+
 Google::Cloud::Kms.configure do |config|
-  config.credentials = JSON.parse(credentials_json)
+  config.credentials = JSON.parse(ENV['GOOGLE_APPLICATION_CREDENTIALS_JSON'])
 end
