@@ -1,18 +1,23 @@
 require "google/cloud/kms"
 require "json"
 
-begin
-  credentials = JSON.parse(ENV['GOOGLE_APPLICATION_CREDENTIALS_JSON'])
-  Rails.logger.info("GOOGLE_APPLICATION_CREDENTIALS_JSON parsed successfully")
-rescue JSON::ParserError => e
-  Rails.logger.error("Failed to parse GOOGLE_APPLICATION_CREDENTIALS_JSON: #{e.message}")
-  credentials = nil
-end
+credentials_json = ENV['GOOGLE_APPLICATION_CREDENTIALS_JSON']
 
-if credentials
-  Google::Cloud::Kms.configure do |config|
-    config.credentials = credentials
+if credentials_json.present?
+  begin
+    credentials = JSON.parse(credentials_json)
+    Rails.logger.info("GOOGLE_APPLICATION_CREDENTIALS_JSON parsed successfully")
+
+    Google::Cloud::Kms.configure do |config|
+      config.credentials = credentials
+    end
+
+    Rails.logger.info("Google Cloud KMS configured successfully")
+  rescue JSON::ParserError => e
+    Rails.logger.error("Failed to parse GOOGLE_APPLICATION_CREDENTIALS_JSON: #{e.message}")
+  rescue => e
+    Rails.logger.error("Failed to configure Google Cloud KMS: #{e.message}")
   end
 else
-  Rails.logger.error("No valid GOOGLE_APPLICATION_CREDENTIALS_JSON found")
+  Rails.logger.error("GOOGLE_APPLICATION_CREDENTIALS_JSON not set or empty")
 end
